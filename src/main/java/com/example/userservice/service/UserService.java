@@ -4,6 +4,7 @@ import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +44,7 @@ public class UserService {
 
     UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
 
-    List<ResponseOrder> orders = new ArrayList<>();
+    List<ResponseOrder> orders = Lists.newArrayList();
     userDto.setOrders(orders);
 
     return userDto;
