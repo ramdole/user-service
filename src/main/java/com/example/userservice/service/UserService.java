@@ -5,20 +5,22 @@ import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder passwordEncoder;
@@ -38,7 +40,7 @@ public class UserService {
   public UserDto getUserByUserId(String userId) {
     UserEntity userEntity = userRepository.findByUserId(userId);
 
-    if(Objects.isNull(userEntity)) {
+    if (Objects.isNull(userEntity)) {
       throw new UsernameNotFoundException("User not found");
     }
 
@@ -52,5 +54,17 @@ public class UserService {
 
   public Iterable<UserEntity> getUserByAll() {
     return userRepository.findAll();
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    UserEntity userEntity = userRepository.findByEmail(username);
+
+    if (Objects.isNull(userEntity)) {
+      throw new UsernameNotFoundException(username);
+    }
+
+    return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
+        Lists.newArrayList());
   }
 }
