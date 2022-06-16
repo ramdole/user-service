@@ -2,6 +2,7 @@ package com.example.userservice.security;
 
 import com.example.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,8 +26,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     http.csrf().disable();
 //    http.authorizeHttpRequests().antMatchers("/user/**").permitAll();
 
-    http.authorizeRequests().antMatchers("/**")
-        .hasIpAddress("127.0.0.1")
+    http.authorizeRequests()
+        .antMatchers("/**").permitAll()
         .and()
         .addFilter(getAuthenticationFilter());
     http.headers().frameOptions().disable();
