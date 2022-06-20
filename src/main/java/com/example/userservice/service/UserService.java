@@ -67,4 +67,14 @@ public class UserService implements UserDetailsService {
     return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
         Lists.newArrayList());
   }
+
+  public UserDto getUserDetailByEmail(String username) {
+    UserEntity userEntity = userRepository.findByEmail(username);
+
+    if(Objects.isNull(userEntity)) {
+      throw new UsernameNotFoundException(username);
+    }
+
+    return new ModelMapper().map(userEntity, UserDto.class);
+  }
 }
