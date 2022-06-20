@@ -5,7 +5,11 @@ import com.example.userservice.service.UserService;
 import com.example.userservice.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,5 +50,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
     String username = ((User) authResult.getPrincipal()).getUsername();
     UserDto userDetails = userService.getUserDetailByEmail(username);
+
+    String token = Jwts.builder()
+        .setSubject(userDetails.getUserId())
+        .setExpiration(new Date(
+            System.currentTimeMillis() + Long.parseLong(
+                Objects.requireNonNull(env.getProperty("token.expiration-time")))))
+        .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
+        .compact();
+
+    response.addHeader("token", token);
+    response.addHeader("userId", userDetails.getUserId());
   }
 }
